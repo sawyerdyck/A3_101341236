@@ -58,37 +58,51 @@ int main(void) {
 				
 			}printf("\n");
 			//rlencoding the photo
-			for(int i = 0;i<packedSize;i++){
-				unsigned char byte = 0;
-				for(int j = 0;j<8;j++){
-					unsigned char entry = dest[i*8 + j];
-					if (entry == '1'){
-						 byte += (1<<(7-j));
-					}	
-				}packed[i] = byte; 
-			}
-			//printing packed photo
-			int newLine = 0;	
-			for(int x = 0;x<packedSize;x++){
-				for(int y = 7;y>=0;y--){
-					if(newLine == cols){
-						printf("\n");
-						newLine = 0;
+			unsigned char run = 1;
+			unsigned char rle[MAX_PHOTO_SIZE+1];
+			int index = 1;
+			unsigned char current = dest[0];
+			rle[0] = current;
+			for(int i = 1;i<size;i++){
+				if (dest[i] == current){
+					run++;
+					if(run == 255){
+						rle[index++] = run;
+						run = 0;
 					}
-					if(packed[x] & (1<<y)){
-						printf("+");
-					}else{
-						printf("-");
-					}
-					newLine++;	
-
+				}else{
+					rle[index++] = run;
+					current = dest[i];
+					run = 1;
 				}
-				
-			}printf("\n");	
+			}
+			rle[index++] = run;
+			//printing packed photo
+			int newLines = 0;
+			int bit = rle[0];	
+			for(int x = 1;x<index;x++){
+				for (int y = 0; y < rle[x];y++){
+					if(newLines == cols){
+						printf("\n");
+						newLines = 0;
+					}
+					if(bit == '1'){
+						printf("#");
+					}else{
+						printf(" ");
+					}
+					newLines++;
+				}if(bit == '1'){
+					bit = '0';
+				}else{
+					bit = '1';
+				}
+			}			
+			printf("\n");	
 
 
 			printf("\n");
-			printf("%d %ld\n", size, sizeof(packed));
+			printf("%d %ld %d\n", size, sizeof(packed), index);
 			
 			size = get_next_photo(dest, &rows, &cols);
 	
