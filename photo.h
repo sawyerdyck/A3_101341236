@@ -14,6 +14,6 @@ int print_packed_bits(const unsigned char photo[], int rows, int cols);
 int rle_encode(unsigned char encoded_result[], const unsigned char packed[], int rows, int cols);
 int print_rle(const unsigned char encoded[]);
 
-
+			
 // Only used for the sidequest. Uncomment if you are attempting the side quest.
 // int print_sq_bits(const unsigned char photo[]);
