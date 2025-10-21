@@ -6,13 +6,13 @@ int print_ascii(const unsigned char photo[], int rows, int cols){
 	//printing original photo
 	for (int i = 0;i<rows;i++){
 		for (int j = 0;j<cols;j++){
-			if (photo[j+(cols*i)] == '1'){
+			if (photo[i * cols + j] == '1'){
 				printf("*");
 			}else{
 				printf(".");
 			}
 		}printf("\n");		
-	}return 0;
+	}printf("\n");return 0;
 }
 
 int pack_bits(unsigned char packed[], const unsigned char photo[], int num_chars){
@@ -21,7 +21,7 @@ int pack_bits(unsigned char packed[], const unsigned char photo[], int num_chars
 	for(int i = 0;i<num_chars;i++){
 		byte = 0;
 		for(int j = 0;j<8;j++){
-			if (photo[i*8 + j] == '1'){
+			if (photo[i* 8 + j] == '1'){
 				 byte += (1<<(7-j));
 			}	
 		}packed[i] = byte; 
@@ -45,17 +45,15 @@ int print_packed_bits(const unsigned char photo[], int rows, int cols){
 				printf("-");
 			}newLine++;
 		}
-	}return maskSize; 
+	}printf("\n");return maskSize; 
 }
 	
 int rle_encode(unsigned char encoded_result[], const unsigned char packed[], int rows, int cols){ 
 	unsigned char run = 0;
 	int index = 2;
-	encoded_result[0] = rows;
-	encoded_result[1] = cols;
 	unsigned char current = 0;
 	int packedSize = (rows*cols)/8;
-
+	encoded_result[1] = 2;
 	for(int i = 0; i<packedSize;i++){
 		unsigned char byte = packed[i];
 		for(int j = 7; j>= 0;j--){
@@ -74,6 +72,8 @@ int rle_encode(unsigned char encoded_result[], const unsigned char packed[], int
 		}
 	}
 	encoded_result[index++] = run;
+	encoded_result[0] = (index-2)/2;
+	printf("%d %d %d", index, encoded_result[0], encoded_result[1]);
 	return index;
 }
 
@@ -81,14 +81,14 @@ int print_rle(const unsigned char encoded[]){
 	//printing packed photo
 	int rows = encoded[0];
 	int cols = encoded[1];
-	int length = rows*cols/8;
+	int length = rows*cols;
 	int count = 0;
 	int bit = 0;
 	int newLines = 0;
 
 	for(int i = 2;i<length;i++){
 		for(int j  = 0; j<encoded[i];j++){
-			if(newLines == cols){
+			if(newLines == 32){
 				printf("\n");
 				newLines = 0;
 			}
@@ -105,5 +105,7 @@ int print_rle(const unsigned char encoded[]){
 	}printf("\n");
 	return length;
 
+
+    return 0;
 }
 /* Your code for the function implementations in photo.h should be place here.*/

@@ -1,12 +1,12 @@
-	
-	unsigned char dest[MAX_PHOTO_SIZE];
-	int rows, cols;
-	int size = get_next_photo(dest, &rows, &cols);
-	if(size%8 != 0){
-		printf("packing error, invalid length");
-	}else{		
-		while (size !=0){
-			int packedSize = size/8;
+int main(void) {
+    unsigned char dest[MAX_PHOTO_SIZE];
+    int rows, cols;
+    int size = get_next_photo(dest, &rows, &cols);
+    if(size%8 != 0){
+        printf("packing error, invalid length");
+    }else{        
+        while (size !=0){
+            int packedSize = size/8;
             unsigned char packed[packedSize];
 
             //printing original photo    
@@ -44,7 +44,68 @@
                         printf("-");
                     }
                     newLine++;    
-
                 }
-                
             }printf("\n");
+
+            //rlencoding the PACKED photo (with rows & cols at start)
+            unsigned char run = 0;
+            unsigned char rle[MAX_PHOTO_SIZE+2];
+            int index = 2; // start storing runs after header
+            rle[0] = rows; // store number of rows
+            rle[1] = cols; // store number of columns
+
+            unsigned char current = 0; // start from MSB
+
+            for(int i = 0;i<packedSize;i++){
+                unsigned char byte = packed[i];
+                for(int j = 7;j>=0;j--){
+                    unsigned char value = (byte >> j) & 1;
+                    if (value == current){
+                        run++;
+                        if(run == 255){
+                            rle[index++] = run;
+                            run = 0;
+                        }
+                    }else{
+                        rle[index++] = run;
+                        current = value;
+                        run = 1;
+                    }
+                }
+            }
+            rle[index++] = run;
+
+            //printing packed photo (decoded from RLE)
+            int newLines = 0;
+            int bit = 0;  // start bit is first bit of packed data
+            for(int x = 2;x<index;x++){
+                for (int y = 0; y < rle[x];y++){
+                    if(newLines == cols){
+                        printf("\n");
+                        newLines = 0;
+                    }
+                    if(bit == 1){
+                        printf("#");
+                    }else{
+                        printf(" ");
+                    }
+                    newLines++;
+                }
+                if(bit == 1){
+                    bit = 0;
+                }else{
+                    bit = 1;
+                }
+            }            
+            printf("\n");    
+
+            printf("\n");
+            printf("%d %ld %d\n", size, sizeof(packed), index);
+            
+            size = get_next_photo(dest, &rows, &cols);
+        }
+    }
+
+    return 0;
+}
+	
