@@ -33,7 +33,7 @@ int get_next_photo(unsigned char dest[], int *rows, int *cols);
   camera_test_rle: Tests if your encoded[] representation accurately encodes packed[]; only valid if the previous test passed for packed[]
 */
 int camera_test_packed(const unsigned char photo[], const unsigned char packed[], int rows, int cols);
-int camera_test_rle(const unsigned char packed[], const unsigned char encoded[], int rows, int cols);
+int camera_test_encoding(const unsigned char packed[], const unsigned char encoded[], int rows, int cols);
 
 // For Side Quest, Described in Specification
 int sq_next_photo(unsigned char photo[]);
