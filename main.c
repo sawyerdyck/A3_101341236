@@ -8,6 +8,7 @@ int main(void) {
         int size = get_next_photo(dest, &rows, &cols);
         if(size%8 != 0){
                 printf("packing error, invalid length");
+		return ERR_INVALID_PHOTO_SIZE;
         }else{
                 while (size !=0){
                         unsigned char packed[PACKED_PHOTO_SIZE] = {0};
